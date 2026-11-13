@@ -1,0 +1,67 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": { "major": 3, "minor": 25, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}"
+    },
+    { "name": "debug",   "hidden": true, "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" } },
+    { "name": "release", "hidden": true, "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" } },
+    {
+      "name": "linux",
+      "hidden": true,
+      "inherits": "base",
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" }
+    },
+    {
+      "name": "gcc",
+      "hidden": true,
+      "cacheVariables": { "CMAKE_C_COMPILER": "gcc", "CMAKE_CXX_COMPILER": "g++" }
+    },
+    {
+      "name": "clang",
+      "hidden": true,
+      "cacheVariables": { "CMAKE_C_COMPILER": "clang", "CMAKE_CXX_COMPILER": "clang++" }
+    },
+    {
+      "name": "windows",
+      "hidden": true,
+      "inherits": "base",
+      "description": "Run from a VS Developer prompt (x64) so cl/clang-cl and the Windows SDK are on PATH.",
+      "architecture": { "value": "x64", "strategy": "external" },
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" }
+    },
+    {
+      "name": "msvc",
+      "hidden": true,
+      "cacheVariables": { "CMAKE_C_COMPILER": "cl", "CMAKE_CXX_COMPILER": "cl" }
+    },
+    {
+      "name": "clangcl",
+      "hidden": true,
+      "cacheVariables": { "CMAKE_C_COMPILER": "clang-cl", "CMAKE_CXX_COMPILER": "clang-cl" }
+    },
+
+    { "name": "linux-gcc-debug",     "inherits": ["linux", "gcc", "debug"] },
+    { "name": "linux-gcc-release",   "inherits": ["linux", "gcc", "release"] },
+    { "name": "linux-clang-debug",   "inherits": ["linux", "clang", "debug"] },
+    { "name": "linux-clang-release", "inherits": ["linux", "clang", "release"] },
+    { "name": "win-msvc-debug",      "inherits": ["windows", "msvc", "debug"] },
+    { "name": "win-msvc-release",    "inherits": ["windows", "msvc", "release"] },
+    { "name": "win-clangcl-debug",   "inherits": ["windows", "clangcl", "debug"] },
+    { "name": "win-clangcl-release", "inherits": ["windows", "clangcl", "release"] }
+  ],
+  "buildPresets": [
+    { "name": "linux-gcc-debug",     "configurePreset": "linux-gcc-debug" },
+    { "name": "linux-gcc-release",   "configurePreset": "linux-gcc-release" },
+    { "name": "linux-clang-debug",   "configurePreset": "linux-clang-debug" },
+    { "name": "linux-clang-release", "configurePreset": "linux-clang-release" },
+    { "name": "win-msvc-debug",      "configurePreset": "win-msvc-debug" },
+    { "name": "win-msvc-release",    "configurePreset": "win-msvc-release" },
+    { "name": "win-clangcl-debug",   "configurePreset": "win-clangcl-debug" },
+    { "name": "win-clangcl-release", "configurePreset": "win-clangcl-release" }
+  ]
+}

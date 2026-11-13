@@ -12,12 +12,16 @@ Vulkan SDK (for `glslc` and validation layers; Vulkan headers come from `externa
 ```sh
 git clone --recursive <repo>            # or: git submodule update --init --recursive
 cmake --list-presets
-cmake --preset linux-clang-debug        # win: win-msvc-debug | win-clangcl-debug
+cmake --preset linux-clang-debug        # linux-{gcc,clang}-{debug,release}
 cmake --build --preset linux-clang-debug
-./build/linux-clang-debug/engine                     # Debug: validation ON by default
-./build/linux-clang-debug/engine --validation=sync   # off | on | sync | gpuav
-./build/linux-clang-debug/engine --gpu=1 --selftest
+./build/linux-clang-debug/bin/engine                     # Debug: validation ON by default
+./build/linux-clang-debug/bin/engine --validation=sync   # off | on | sync | gpuav
+./build/linux-clang-debug/bin/engine --gpu=1 --selftest
 ```
+Windows: run from an x64 VS Developer prompt (Ninja generator; `cl`/`clang-cl` must be on PATH), presets
+`win-{msvc,clangcl}-{debug,release}`, binary at `build\<preset>\bin\engine.exe`.
+Linux GLFW build deps (Debian/Ubuntu): `libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
+libwayland-dev libxkbcommon-dev wayland-protocols`.
 Shaders compile as part of the build (`glslc` → `<exe_dir>/shaders/*.spv`). Tracy: configure with `-DHD_TRACY=ON`.
 
 ## Code conventions

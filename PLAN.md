@@ -395,8 +395,9 @@ HerobrineDamped/
 │   └── trace.comp  gen_brick.comp  gen_finalize.comp  ...  (M2+)
 ├── src/
 │   ├── main.c                  arg parsing, app loop
-│   ├── base/                   base.h (types, macros, VK_CHECK, ASSERT), arena.c, log.c, os.h,
-│   │                           os_win32.c, os_posix.c (time, file, threads later), atomics.h, ds_impl.c
+│   ├── base/                   base.h (types, macros, VK_CHECK, ASSERT), arena.c, log.c, mem.c (counted heap),
+│   │                           os.h/os.c, os_win32.c, os_posix.c (time, vm, file, threads later), atomics.h,
+│   │                           bits.h, ds.h + ds_impl.c (stb_ds via mem_*), selftest.c
 │   ├── gpu/                    vk_ctx.c (instance/device/queues/VMA), vk_swapchain.c, vk_frame.c,
 │   │                           vk_sync.c (barrier helpers), vk_debug.c (names/labels/messenger),
 │   │                           vk_pipeline.c (compute pipelines, SPIR-V load, hot reload),

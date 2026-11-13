@@ -24,4 +24,6 @@ option(HD_TRACY "Build and enable the Tracy profiler client" OFF)
 include(cmake/CompilerOptions.cmake)
 include(cmake/Dependencies.cmake)
 
+enable_testing()
+
 add_subdirectory(src)

@@ -17,6 +17,8 @@ cmake --build --preset linux-clang-debug
 ./build/linux-clang-debug/bin/engine                     # Debug: validation ON by default
 ./build/linux-clang-debug/bin/engine --validation=sync   # off | on | sync | gpuav
 ./build/linux-clang-debug/bin/engine --gpu=1 --selftest
+ctest --test-dir build/linux-clang-debug --output-on-failure   # runs --selftest (no GPU needed)
+clang-format --dry-run -Werror src/**/*.[ch]                     # formatting check
 ```
 Windows: run from an x64 VS Developer prompt (Ninja generator; `cl`/`clang-cl` must be on PATH), presets
 `win-{msvc,clangcl}-{debug,release}`, binary at `build\<preset>\bin\engine.exe`.

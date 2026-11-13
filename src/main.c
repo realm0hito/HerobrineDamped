@@ -1,3 +1,7 @@
+#include "base/base.h"
+#include "base/log.h"
+#include "base/selftest.h"
+
 #include <stdio.h>
 #include <string.h>
 
@@ -6,7 +10,7 @@
 #include <GLFW/glfw3.h>
 #include <cglm/cglm.h>
 #include <cglm/version.h>
-#include <stb_ds.h>
+#include "base/ds.h"
 #define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
 #include <cimgui.h>
 #include <cimgui_impl.h>
@@ -53,10 +57,18 @@ static int print_versions(void)
 
 int main(int argc, char **argv)
 {
+    log_init(LOG_LEVEL_INFO);
     TracyCZoneN(zone, "main", 1);
     int rc = 0;
     for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "--version") == 0) rc = print_versions();
+        if (strcmp(argv[i], "--version") == 0) {
+            rc |= print_versions();
+        } else if (strcmp(argv[i], "--selftest") == 0) {
+            rc |= base_selftest() != 0;
+        } else {
+            LOG_ERROR("unknown argument '%s'", argv[i]);
+            rc = 2;
+        }
     }
     TracyCZoneEnd(zone);
     return rc;

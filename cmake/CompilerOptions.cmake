@@ -7,6 +7,11 @@ function(hd_target_options target)
             /W4 /permissive- /utf-8 /Zc:preprocessor
             $<$<BOOL:${HD_WERROR}>:/WX>)
         target_compile_definitions(${target} PRIVATE _CRT_SECURE_NO_WARNINGS NOMINMAX WIN32_LEAN_AND_MEAN)
+        if(NOT CMAKE_C_COMPILER_ID STREQUAL "Clang")
+            # cl only: treat <...> includes (Windows SDK, CRT) as external, so /W4 + /Zc:preprocessor noise from
+            # SDK headers stays out. clang-cl already treats INCLUDE paths as system headers.
+            target_compile_options(${target} PRIVATE /external:anglebrackets /external:W0)
+        endif()
     else()
         target_compile_options(${target} PRIVATE
             -Wall -Wextra -Wshadow -Wno-unused-parameter

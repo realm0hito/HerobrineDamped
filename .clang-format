@@ -13,7 +13,7 @@ BraceWrapping:
   AfterControlStatement: Never
   BeforeElse: false
 PointerAlignment: Right
-AllowShortFunctionsOnASingleLine: InlineOnly
+AllowShortFunctionsOnASingleLine: All
 AllowShortIfStatementsOnASingleLine: WithoutElse
 AllowShortLoopsOnASingleLine: true
 AllowShortBlocksOnASingleLine: Empty

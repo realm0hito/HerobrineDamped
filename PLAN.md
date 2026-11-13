@@ -423,13 +423,17 @@ HerobrineDamped/
     MSVC/clang-cl `/W4 /permissive- /utf-8 /Zc:preprocessor`. `-Werror`/`/WX` via option `HD_WERROR` (ON in CI).
   - Third-party (all `SYSTEM`, `EXCLUDE_FROM_ALL`): `Vulkan::Headers`, `volk` (static, `VOLK_PULL_IN_VULKAN=OFF`, we
     link `Vulkan::Headers` explicitly so the header version is the pinned one, not whatever SDK is installed),
-    `VulkanMemoryAllocator` (interface), `glfw` (static, examples/tests/docs/install OFF), `cglm_headers`
-    (interface, header-only inline API), `stb` (interface: include dir), `hd_imgui` (static C++: cimgui.cpp,
-    cimgui_impl.cpp, imgui*.cpp, backends/imgui_impl_{glfw,vulkan}.cpp; defines `CIMGUI_USE_GLFW CIMGUI_USE_VULKAN
-    IMGUI_IMPL_VULKAN_USE_VOLK IMGUI_DISABLE_OBSOLETE_FUNCTIONS IMGUI_IMPL_API=extern "C"`), `TracyClient` (only if
-    `HD_TRACY=ON`).
-  - Global compile definitions: `VK_NO_PROTOTYPES` (volk), `GLFW_INCLUDE_NONE`, `VMA_STATIC_VULKAN_FUNCTIONS=0`,
-    `VMA_DYNAMIC_VULKAN_FUNCTIONS=0` (functions imported with `vmaImportVulkanFunctionsFromVolk`).
+    `VulkanMemoryAllocator` (interface), `glfw` (static, examples/tests/docs/install OFF), `hd_cglm` and `hd_stb`
+    (our interface targets, include path only — cglm's own CMake adds directory-wide flags and CPack, so it is not
+    added), `hd_imgui` (static C++: cimgui.cpp, cimgui_impl.cpp, imgui*.cpp, backends/imgui_impl_{glfw,vulkan}.cpp;
+    public defines `CIMGUI_USE_GLFW CIMGUI_USE_VULKAN IMGUI_DISABLE_OBSOLETE_FUNCTIONS=1`; private
+    `IMGUI_USER_CONFIG="hd_imconfig.h"` (`cmake/imgui/`) which sets `IMGUI_IMPL_API extern "C"` and
+    `IMGUI_IMPL_VULKAN_USE_VOLK` — avoids quoting a define with spaces on every generator), `hd_tracy` (interface:
+    Tracy include path always, links `TracyClient` only if `HD_TRACY=ON`, so `TracyC.h` macros are no-ops otherwise).
+  - Usage requirements carried by targets (not global): `VK_NO_PROTOTYPES` (on `volk`), `GLFW_INCLUDE_NONE` (on
+    `glfw`), `VMA_STATIC_VULKAN_FUNCTIONS=0 VMA_DYNAMIC_VULKAN_FUNCTIONS=0` (on `VulkanMemoryAllocator`; functions
+    imported with `vmaImportVulkanFunctionsFromVolk`).
+  - `engine --version` prints every dependency's version (and proves each links).
   - `shaders` custom target: `hd_add_shaders(engine shaders/*.comp)` → for each source
     `glslc --target-env=vulkan1.3 -std=460 -I shaders -MD -MF <dep> [-g -O0 | -O] -o <bin>/shaders/<name>.spv`,
     `DEPFILE` so includes trigger rebuilds; `engine` depends on it. `glslc` found via `find_package(Vulkan COMPONENTS glslc)`
@@ -457,9 +461,9 @@ tree, reviewable in diffs. Cost: `git clone --recursive` / `git submodule update
 | VMA | `v3.5.0` | `0f1a757da579831283413295cc7f3b47eb521c77` | 2026-10-26 | `vmaImportVulkanFunctionsFromVolk`, `VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT`; header-only interface target → our `vma_impl.cpp`. |
 | GLFW | `3.5.1` | `d9d6f0f1f967807ffade6598ea9a631ebaf37a56` | 2026-07-31 | `glfwInitVulkanLoader(vkGetInstanceProcAddr)` (call after `volkInitialize`, before `glfwInit`); Win32/X11/Wayland. |
 | SDL3 (alternative) | `release-3.4.20` | `f00dc919ca35b9756316e86c4777392de442f9b2` | 2026-11-03 | Only if chosen over GLFW. |
-| cglm | `v0.9.7` | `888aca08d5bdf38e873ec23d6cac42d7f23a669c` | 2026-10-25 | `cglm_headers` INTERFACE target (header-only, inline). |
+| cglm | `v0.9.7` | `888aca08d5bdf38e873ec23d6cac42d7f23a669c` | 2026-10-25 | Used header-only via our `hd_cglm` include target; `cglm/version.h` must be included explicitly for version macros. |
 | stb (stb_ds.h) | no tags | `9600522de53973336fa033a289858a4354cbb04c` | 2026-11-12 | Pin by commit; only `stb_ds.h` used. |
-| cimgui | `1.93dock` | `2a6a93fccd10f275ee9206167dc9698f6f00fac1` | 2026-10-18 | imgui submodule `6d32174508fb8c518e7a832cc1d571fadd5cba76` = **imgui 1.93.0 (docking)**. Master is docking-only now. Its CMakeLists does **not** build backends → we define `hd_imgui` ourselves. `cimgui_impl.h` has `CIMGUI_USE_VULKAN`/`CIMGUI_USE_GLFW`, C-compatible `ImGui_ImplVulkan_InitInfo` (incl. `ImVector_VkDynamicState`). |
+| cimgui | `1.93dock` | `2a6a93fccd10f275ee9206167dc9698f6f00fac1` | 2026-10-18 | imgui submodule `6d32174508fb8c518e7a832cc1d571fadd5cba76` = **imgui 1.93.0 (docking)**, one commit past `v1.93.0`. Master is docking-only now. Its CMakeLists does **not** build backends → we define `hd_imgui` ourselves. `cimgui_impl.h` has `CIMGUI_USE_VULKAN`/`CIMGUI_USE_GLFW`, C-compatible `ImGui_ImplVulkan_InitInfo` (incl. `ImVector_VkDynamicState`). |
 | Tracy | `v0.15.0` | `f2a4f2529e7e71844c9e434b877770a21ecf7587` | 2026-11-05 | C API `TracyC.h` (`TracyCZoneN`, `TracyCFrameMark`, manual GPU API `___tracy_emit_gpu_*`). `TracyVulkan.hpp` is C++-only → we feed GPU zones from our own timestamp queries. Viewer must match 0.15.x protocol. |
 
 API facts that shape the code (from current sources):

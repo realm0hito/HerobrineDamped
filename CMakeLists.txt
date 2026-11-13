@@ -19,7 +19,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 option(HD_WERROR "Treat engine warnings as errors" OFF)
 option(HD_ASAN "Enable AddressSanitizer + UBSan on engine code (GCC/Clang)" OFF)
+option(HD_TRACY "Build and enable the Tracy profiler client" OFF)
 
 include(cmake/CompilerOptions.cmake)
+include(cmake/Dependencies.cmake)
 
 add_subdirectory(src)

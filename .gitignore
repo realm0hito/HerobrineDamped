@@ -1,0 +1,42 @@
+# Build output
+/build/
+/out/
+/cmake-build-*/
+CMakeUserPresets.json
+CMakeCache.txt
+CMakeFiles/
+compile_commands.json
+
+# Generated
+*.spv
+*.spv.d
+
+# Native artifacts
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.exe
+*.pdb
+*.ilk
+*.exp
+
+# IDE / tools
+.vs/
+.vscode/
+.idea/
+.cache/
+.clangd/
+*.swp
+*~
+.DS_Store
+
+# Runtime / profiling / captures
+imgui.ini
+*.tracy
+*.rdc
+*.log
+/captures/
+/bench/*.csv
